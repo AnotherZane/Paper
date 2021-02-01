@@ -1,0 +1,45 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: AnotherZane <zanedpereira2@gmail.com>
+Date: Mon, 1 Feb 2021 20:49:16 +0530
+Subject: [PATCH] Make falling block dupe configurable
+
+
+diff --git a/src/main/java/com/destroystokyo/paper/PaperConfig.java b/src/main/java/com/destroystokyo/paper/PaperConfig.java
+index 673c40d952bae6ae9e92aac9742e58ffb6a8b1bb..ee9004967b795f694003a680b41f6724555b97be 100644
+--- a/src/main/java/com/destroystokyo/paper/PaperConfig.java
++++ b/src/main/java/com/destroystokyo/paper/PaperConfig.java
+@@ -443,6 +443,12 @@ public class PaperConfig {
+         set("settings.unsupported-settings.allow-tnt-duplication", null);
+     }
+ 
++    public static boolean allowFallingBlockDuplication;
++    private static void allowFallingBlockDuplication() {
++        config.set("settings.unsupported-settings.allow-falling-block-duplication-readme", "This setting controls if players should be able to duplicate falling blocks.");
++        allowHeadlessPistons = getBoolean("settings.unsupported-settings.allow-falling-block-duplication", false);
++    }
++
+     public static boolean allowHeadlessPistons;
+     private static void allowHeadlessPistons() {
+         config.set("settings.unsupported-settings.allow-headless-pistons-readme", "This setting controls if players should be able to create headless pistons.");
+diff --git a/src/main/java/net/minecraft/server/EntityFallingBlock.java b/src/main/java/net/minecraft/server/EntityFallingBlock.java
+index 76aac1b131f314775e418339e434f4f2da2ad619..bc149ae8847a236e20b2e615c208526fe2734607 100644
+--- a/src/main/java/net/minecraft/server/EntityFallingBlock.java
++++ b/src/main/java/net/minecraft/server/EntityFallingBlock.java
+@@ -65,7 +65,7 @@ public class EntityFallingBlock extends Entity {
+     @Override
+     public void tick() {
+         // Paper start - fix sand duping
+-        if (this.dead) {
++        if (this.dead && !com.destroystokyo.paper.PaperConfig.allowFallingBlockDuplication) {
+             return;
+         }
+         // Paper end - fix sand duping
+@@ -92,7 +92,7 @@ public class EntityFallingBlock extends Entity {
+             this.move(EnumMoveType.SELF, this.getMot());
+ 
+             // Paper start - fix sand duping
+-            if (this.dead) {
++            if (this.dead && !com.destroystokyo.paper.PaperConfig.allowFallingBlockDuplication) {
+                 return;
+             }
+             // Paper end - fix sand duping
